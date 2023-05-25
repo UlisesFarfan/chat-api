@@ -25,3 +25,10 @@ const chatSchema = new Schema<ChatInterface>(
 const ChatModel = model("Chat", chatSchema, "chats");
 ChatModel.syncIndexes();
 export default ChatModel;
+
+// {
+//   "nombre": "Ulises",
+//   "apellido": "Farfan",
+//   "edad": null,
+//   "mascota": ["Murray", "Kira", "Tina"]
+// }

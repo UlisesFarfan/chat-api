@@ -17,6 +17,9 @@ const userSchema = new Schema<UserInterface>(
             type: [Types.ObjectId],
             ref: "Chat",
         },
+        description: {
+            type: String || null,
+        },
         email: {
             type: String,
             required: true,

@@ -30,11 +30,9 @@ passport.deserializeUser((id: string, done: any) => {
       path: "chats"
     })
     .then((user: any) => {
-      console.log(user);
       done(null, user);
     })
     .catch((err: any) => {
-      console.log(err);
       done(err, null);
     });
 });

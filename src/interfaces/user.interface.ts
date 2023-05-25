@@ -8,6 +8,7 @@ export interface UserInterface extends Document {
     contacts: ObjectId[];
     blocked: ObjectId[];
     chats: ChatInterface[];
+    description: string;
     email: string;
     hash: string;
     salt: string;
