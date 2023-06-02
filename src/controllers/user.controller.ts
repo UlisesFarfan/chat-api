@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { deleteUserById, serviceCreateUser, addContact } from "../services/user.service";
+import { deleteUserById, serviceCreateUser, addContact, getContactByUserId } from "../services/user.service";
 
 const createUser = async ({ body }: Request, res: Response) => {
   try {
@@ -41,10 +41,10 @@ const deleteUsers = async ({ params }: Request, res: Response) => {
   }
 };
 
-const controllerAddContact = async ({ body }: Request, res: Response) => {
+const addContactController = async ({ body }: Request, res: Response) => {
   try {
     const { userId, contactId } = body
-    const addContactMessage = addContact(userId, contactId)
+    const addContactMessage = await addContact(userId, contactId)
     res.status(200).json({
       message: addContactMessage
     })
@@ -55,4 +55,16 @@ const controllerAddContact = async ({ body }: Request, res: Response) => {
   }
 };
 
-export { createUser, deleteUsers, controllerAddContact };
+const getContactByUserIdController = async ({ params }: Request, res: Response) => {
+  try {
+    const { id } = params
+    const contacts = await getContactByUserId(id)
+    res.status(200).json(contacts)
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    })
+  }
+}
+
+export { createUser, deleteUsers, addContactController, getContactByUserIdController };

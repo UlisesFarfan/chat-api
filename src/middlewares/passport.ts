@@ -25,10 +25,8 @@ passport.serializeUser((user: any, done: any) => {
 });
 
 passport.deserializeUser((id: string, done: any) => {
+  console.log("1")
   UserModel.findById(id)
-    .populate({
-      path: "chats"
-    })
     .then((user: any) => {
       done(null, user);
     })
@@ -59,6 +57,7 @@ server.grant(
 passport.use(
   "client-password",
   new ClientPasswordStrategy(function (client_id, client_secret, done) {
+    console.log("2")
     UserModel.findOne({ "client.client_id": client_id })
       .populate({
         path: "chats"
@@ -83,10 +82,9 @@ passport.use(
     },
     async (username: string, password: string, done: any) => {
       try {
+        console.log("3")
         const user = await UserModel.findOne({
           email: username,
-        }).populate({
-          path: "chats"
         }).populate({
           path: "token",
           select: "access refresh",
@@ -135,10 +133,15 @@ server.exchange(
     try {
       let tokens: any;
       // Find user by email
+      console.log("4")
       const userData: UserTypes | any = await UserModel.findOne({
         email: username,
-      }).populate({
-        path: "chats"
+      }, {
+        contacts: 0,
+        blocked: 0,
+        chats: 0,
+        requests: 0,
+        notifications: 0
       }).populate({
         path: "token",
         select: "access refresh",
@@ -220,6 +223,7 @@ server.exchange(
             ).exec();
 
             // Update user token
+            console.log("5")
             const updateUser = await UserModel.findOneAndUpdate(
               { email: username },
               {
@@ -273,6 +277,7 @@ server.exchange(
       ).exec();
 
       // Update user token
+      console.log("6")
       const updateUser = await UserModel.findOneAndUpdate(
         { email: username },
         {
@@ -321,8 +326,15 @@ server.exchange(
       const decoded: any = verifyRefreshToken(refreshToken);
 
       // Find user by email
+      console.log("7")
       const userData: UserTypes | any = await UserModel.findOne({
-        email: decoded.payload?.email,
+        email: decoded.payload?.email
+      }, {
+        contacts: 0,
+        blocked: 0,
+        chats: 0,
+        requests: 0,
+        notifications: 0
       })
         .select("-hash -salt")
 
@@ -340,7 +352,7 @@ server.exchange(
       if (!userData) {
         return done(null, false, "User not found");
       }
-
+      
       if (userData.token?.access) {
         try {
           // Verify access token
@@ -384,6 +396,7 @@ server.exchange(
             ).exec();
 
             // Update user token
+            console.log("8")
             const updateUser = await UserModel.findOneAndUpdate(
               { email: userData.email },
               {
@@ -429,6 +442,7 @@ server.exchange(
 
 server.exchange(
   exchange.clientCredentials(function (client, scope, done) {
+    console.log("9")
     UserModel.findOne({ "client.client_id": client })
       .then((response: any) => {
         if (!response) {

@@ -17,8 +17,16 @@ const userSchema = new Schema<UserInterface>(
             type: [Types.ObjectId],
             ref: "Chat",
         },
+        requests: {
+            type: [Types.ObjectId],
+            ref: "Request",
+        },
         description: {
             type: String || null,
+        },
+        notifications: {
+            type: [Types.ObjectId],
+            ref: "Notification",
         },
         email: {
             type: String,

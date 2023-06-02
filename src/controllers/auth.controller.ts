@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import UserModel from "../models/user.schema";
 import { verifyToken } from "../utils/jwt.utils";
+import { getUserById } from "../services/user.service";
 
 const logoutUser = async (req: Request, res: Response) => {
   try {
@@ -20,7 +21,7 @@ const logoutUser = async (req: Request, res: Response) => {
   }
 };
 
-const getAuthUser = async (req: Request, res: Response) => {
+const getAuthUserController = async (req: Request, res: Response) => {
   try {
     if (!req.headers?.authorization) {
       return res.status(401).json({
@@ -72,7 +73,7 @@ const getAuthUser = async (req: Request, res: Response) => {
   }
 };
 
-const getAllUsers = async (req: Request, res: Response) => {
+const getAllUsersController = async (req: Request, res: Response) => {
   try {
     const user = await UserModel.find().populate({
       path: "chats",
@@ -86,10 +87,10 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-const getUserById = async (req: Request, res: Response) => {
+const getUserByIdController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const user: any = await UserModel.findById(id);
+    const user: any = await getUserById(id)
     res.status(200).json(user);
   } catch (error: any) {
     console.log(error);
@@ -99,7 +100,7 @@ const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-const patchUserById = async (req: Request, res: Response) => {
+const patchUserByIdController = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const body = req.body;
@@ -113,4 +114,4 @@ const patchUserById = async (req: Request, res: Response) => {
   }
 };
 
-export { getAuthUser, logoutUser, getAllUsers, getUserById, patchUserById };
+export { getAuthUserController, logoutUser, getAllUsersController, getUserByIdController, patchUserByIdController };

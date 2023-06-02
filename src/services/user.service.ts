@@ -2,6 +2,7 @@ import { UserInterface } from "../interfaces/user.interface";
 import UserModel from "../models/user.schema";
 import { verifyRefreshToken } from "../utils/jwt.utils";
 import { hashPassword } from "../utils/password.utils";
+import { ObjectId } from "mongoose";
 
 type OrganizationRegister = {
   duns?: string;
@@ -12,7 +13,7 @@ type OrganizationRegister = {
 interface RegisterInput extends UserInterface {
   password: string;
   organization: OrganizationRegister;
-}
+};
 
 const serviceCreateUser = async (body: RegisterInput) => {
   const { name, email, password } = body;
@@ -94,14 +95,59 @@ const extractUser = async (headers: any): Promise<string> => {
 
 const addContact = async (userId: string, contactId: string) => {
   try {
-    UserModel.updateOne(
-      {_id: userId},
-      {$push: {contacts: contactId}}
-      )
+    console.log(userId, contactId)
+    await UserModel.findByIdAndUpdate(
+      userId,
+      {
+        $push: {
+          contacts: contactId
+        }
+      },
+      { new: true }
+    )
+    await UserModel.findByIdAndUpdate(
+      contactId,
+      {
+        $push: {
+          contacts: userId
+        }
+      },
+      { new: true }
+    )
     return "Contact Added Successfully"
-  } catch(error: any) {
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const removeChat = async (userId: string, chatId: string) => {
+  try {
+    UserModel.updateOne(
+      { _id: userId },
+      { $pull: { chat: chatId } }
+    );
+    return "Contact removed Successfully";
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const getUserById = async (id: string) => {
+  try {
+    const user = await UserModel.findById(id);
+    return user;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const getContactByUserId = async (userId: string) => {
+  try {
+    const user = await UserModel.findById(userId).populate({ path: "contacts", select: "name description" });
+    return user?.contacts;
+  } catch (error: any) {
     throw error;
   }
 }
 
-export { serviceCreateUser, deleteUserById, extractUser, addContact };
+export { serviceCreateUser, deleteUserById, extractUser, addContact, removeChat, getUserById, getContactByUserId };

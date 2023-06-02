@@ -29,6 +29,7 @@ const verifyToken = (
       if (error) {
         throw error;
       }
+      console.log(decoded)
       return {
         email: decoded?.email,
       };
@@ -66,6 +67,7 @@ const verifyRefreshToken = (payload: any): any => {
       if (error) {
         throw error;
       }
+      console.log(decoded)
       return decoded;
     }
   );
