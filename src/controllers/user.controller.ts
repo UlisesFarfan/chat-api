@@ -1,5 +1,12 @@
 import { Request, Response } from "express";
-import { deleteUserById, serviceCreateUser, addContact, getContactByUserId } from "../services/user.service";
+import {
+  deleteUserById,
+  serviceCreateUser,
+  addContact,
+  getContactByUserId,
+  getContactsByName,
+  getAllKpisData
+} from "../services/user.service";
 
 const createUser = async ({ body }: Request, res: Response) => {
   try {
@@ -23,7 +30,7 @@ const createUser = async ({ body }: Request, res: Response) => {
 
 const deleteUsers = async ({ params }: Request, res: Response) => {
   try {
-    const messageDelete = await deleteUserById(params._id);
+    const messageDelete = await deleteUserById(params.id);
 
     res.status(201).json({
       message: messageDelete,
@@ -67,4 +74,37 @@ const getContactByUserIdController = async ({ params }: Request, res: Response) 
   }
 }
 
-export { createUser, deleteUsers, addContactController, getContactByUserIdController };
+const getContactByContactNameController = async ({ query, params }: Request, res: Response) => {
+  try {
+    const { userName } = query
+    const { id } = params
+    if (typeof id !== "string" || typeof userName !== "string") throw { message: "invalid data" }
+    const contacts = await getContactsByName(id, userName)
+    res.status(200).json(contacts)
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    })
+  }
+}
+
+const getAllKpisDataController = async ({ query, params }: Request, res: Response) => {
+  try {
+    const { id } = params
+    const usersNumber = await getAllKpisData(id)
+    res.status(200).json(usersNumber)
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    })
+  }
+}
+
+export {
+  createUser,
+  deleteUsers,
+  addContactController,
+  getContactByUserIdController,
+  getContactByContactNameController,
+  getAllKpisDataController,
+};

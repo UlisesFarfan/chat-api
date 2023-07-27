@@ -17,8 +17,14 @@ const messageSchema = new Schema<MessageInterface>(
             ref: "Chat",
             required: true
         },
+        _delete: {
+            type: Boolean,
+            required: true,
+            default: false
+        },
         date: {
             type: Date,
+            default: new Date()
         }
     },
     {

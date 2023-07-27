@@ -15,6 +15,7 @@ const notificationSchema = new Schema<NotificationInterface>(
     },
     date: {
       type: Date,
+      default: new Date()
     }
   },
   {

@@ -7,9 +7,9 @@ const chatSchema = new Schema<ChatInterface>(
       type: [Types.ObjectId],
       ref: "User",
     },
-    messageToView: {
-      type: Boolean,
-      default: false
+    lastMessage: {
+      type: Types.ObjectId,
+      ref: "Message"
     },
     messagesId: {
       type: [Types.ObjectId],

@@ -4,7 +4,7 @@ import { ObjectId } from "mongoose";
 
 export interface ChatInterface extends Document {
     users: ObjectId[];
-    messageToView: any;
+    lastMessage: ObjectId;
     messagesId: ObjectId[];
   }
   

@@ -4,6 +4,7 @@ import { MessageInterface } from "../interfaces/message.interface";
 
 const newMessage = async (body: MessageInterface) => {
   try {
+    body.date = new Date()
     const newMessage = new MessageModel(body);
 
     await newMessage.save();
@@ -14,7 +15,7 @@ const newMessage = async (body: MessageInterface) => {
         $push: {
           messagesId: newMessage._id,
         },
-        messageToview: true
+        lastMessage: newMessage._id
       },
       { new: true }
     );
@@ -27,6 +28,21 @@ const newMessage = async (body: MessageInterface) => {
   } catch (error: any) {
     throw error;
   }
+};
+
+const deleteMessageById = async (id: string) => {
+  try {
+    console.log(id)
+    const a = await MessageModel.findByIdAndUpdate(id, {
+      _delete: true
+    })
+    return "delete successfully"
+  } catch (error: any) {
+    throw error;
+  }
 }
 
-export { newMessage }
+export {
+  newMessage,
+  deleteMessageById,
+}

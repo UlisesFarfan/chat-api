@@ -64,9 +64,9 @@ export const register = async (user: any) => {
   }
 };
 
-const deleteUserById = async (_id: string) => {
+const deleteUserById = async (id: string) => {
   try {
-    await UserModel.findByIdAndDelete(_id);
+    await UserModel.findByIdAndDelete(id);
     return "User deleted successfully";
   } catch (error: any) {
     throw error;
@@ -141,6 +141,26 @@ const getUserById = async (id: string) => {
   }
 };
 
+const getContactsByName = async (userId: string, userName: string) => {
+  try {
+    let user = await UserModel.findById(userId, {
+      contacts: 1
+    })
+      .populate({ path: "contacts", select: "name description" });
+    const result: any = [];
+    if (user) {
+      user.contacts.forEach((el: any) => {
+        if (el.name.toLocaleLowerCase().includes(userName.toLocaleLowerCase())) {
+          result.push(el)
+        }
+      })
+    }
+    return result;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
 const getContactByUserId = async (userId: string) => {
   try {
     const user = await UserModel.findById(userId).populate({ path: "contacts", select: "name description" });
@@ -148,6 +168,38 @@ const getContactByUserId = async (userId: string) => {
   } catch (error: any) {
     throw error;
   }
+};
+
+const getAllKpisData = async (id: string) => {
+  try {
+    const users = await UserModel.find()
+    const contacts = await UserModel.findById(id, {
+      contacts: 1,
+      blocked: 1,
+      requests: 1,
+      _id: 0
+    })
+      .populate({ path: "contacts", select: "name description" });
+    return {
+      total_users: users.length,
+      contacts: contacts?.contacts,
+      blocked: contacts?.blocked.length,
+      requests: contacts?.requests.length
+    }
+  } catch (error: any) {
+    throw error;
+  }
 }
 
-export { serviceCreateUser, deleteUserById, extractUser, addContact, removeChat, getUserById, getContactByUserId };
+export {
+  serviceCreateUser,
+  deleteUserById,
+  extractUser,
+  addContact,
+  removeChat,
+  getUserById,
+  getContactByUserId,
+  getContactsByName,
+  getAllKpisData
+};
+

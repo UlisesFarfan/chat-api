@@ -22,7 +22,8 @@ const userSchema = new Schema<UserInterface>(
             ref: "Request",
         },
         description: {
-            type: String || null,
+            type: String,
+            default: "Hey there! I am using Chat App"
         },
         notifications: {
             type: [Types.ObjectId],

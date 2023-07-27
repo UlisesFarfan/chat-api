@@ -1,5 +1,5 @@
 import { Schema, model, Types } from "mongoose";
-import { RequestsInterface } from "../interfaces/requests.interface";
+import { RequestsInterface, TypeStatus } from "../interfaces/requests.interface";
 
 const requestSchema = new Schema<RequestsInterface>(
   {
@@ -13,8 +13,18 @@ const requestSchema = new Schema<RequestsInterface>(
       ref: "User",
       required: true
     },
+    status: {
+      type: String,
+      enum: [
+        TypeStatus.PENDING,
+        TypeStatus.REJECTED,
+        TypeStatus.ACEPTED,
+      ],
+      default: TypeStatus.PENDING
+    },
     date: {
       type: Date,
+      default: new Date()
     }
   },
   {
