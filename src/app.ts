@@ -13,7 +13,7 @@ import passport from "passport";
 const app = express();
 
 const corsOptions = {
-  origin: "https://chat-app-eta-cyan.vercel.app/",
+  origin: "*",
   credentials: true,
   preflightContinue: false,
 };
