@@ -1,6 +1,8 @@
 import MessageModel from "../models/message.schema";
 import ChatModel from "../models/chat.schema";
 import { MessageInterface } from "../interfaces/message.interface";
+import UserModel from "../models/user.schema";
+import mongoose, { Schema } from "mongoose";
 
 const newMessage = async (body: MessageInterface) => {
   try {
@@ -22,6 +24,21 @@ const newMessage = async (body: MessageInterface) => {
 
     if (addMessageToChat) {
       await addMessageToChat.save();
+      for (let i = 0; i < addMessageToChat.users.length; i++) {
+        const userChat = await UserModel.find({
+          _id: addMessageToChat.users[i],
+          chats: [addMessageToChat._id]
+        })
+        const userArchive = await UserModel.find({
+          _id: addMessageToChat.users[i],
+          archive_chats: [addMessageToChat._id]
+        })
+        if (userChat.length === 0 && userArchive.length === 0) {
+          await UserModel.findByIdAndUpdate(addMessageToChat.users[i], {
+            $addToSet: { chats: addMessageToChat._id }
+          })
+        }
+      }
     }
 
     return newMessage;

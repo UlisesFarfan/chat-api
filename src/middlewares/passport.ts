@@ -137,7 +137,8 @@ server.exchange(
         blocked: 0,
         chats: 0,
         requests: 0,
-        notifications: 0
+        notifications: 0,
+        archive_chats: 0
       }).populate({
         path: "token",
         select: "access refresh",
@@ -327,7 +328,8 @@ server.exchange(
         blocked: 0,
         chats: 0,
         requests: 0,
-        notifications: 0
+        notifications: 0,
+        archive_chats: 0
       })
         .select("-hash -salt")
 
@@ -345,7 +347,7 @@ server.exchange(
       if (!userData) {
         return done(null, false, "User not found");
       }
-      
+
       if (userData.token?.access) {
         try {
           // Verify access token

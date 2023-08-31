@@ -7,10 +7,12 @@ export interface UserInterface extends Document {
   name: string;
   contacts: ObjectId[];
   blocked: ObjectId[];
-  chats: ChatInterface[];
+  chats: ObjectId[];
+  archive_chats: Array<ObjectId>;
   requests: ObjectId[];
   notifications: ObjectId[];
   description: string;
+  tag: string;
   email: string;
   hash: string;
   salt: string;

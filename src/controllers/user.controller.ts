@@ -5,7 +5,11 @@ import {
   addContact,
   getContactByUserId,
   getContactsByName,
-  getAllKpisData
+  getContactBlocked,
+  upDateInfo,
+  putBlockUser,
+  deleteContact,
+  deleteAccountUser
 } from "../services/user.service";
 
 const createUser = async ({ body }: Request, res: Response) => {
@@ -28,7 +32,7 @@ const createUser = async ({ body }: Request, res: Response) => {
   }
 };
 
-const deleteUsers = async ({ params }: Request, res: Response) => {
+const deleteUserController = async ({ params }: Request, res: Response) => {
   try {
     const messageDelete = await deleteUserById(params.id);
 
@@ -45,66 +49,121 @@ const deleteUsers = async ({ params }: Request, res: Response) => {
       keys: error.keys ? error.keys : undefined,
       message: error.message,
     });
-  }
+  };
 };
 
-const addContactController = async ({ body }: Request, res: Response) => {
+const addContactController = async (req: Request, res: Response) => {
   try {
-    const { userId, contactId } = body
-    const addContactMessage = await addContact(userId, contactId)
-    res.status(200).json({
-      message: addContactMessage
-    })
+    const { userId, userTag } = req.body;
+    console.log(userId, userTag)
+    if (typeof userId !== "string" || typeof userTag !== "string") return "Invalid Data.";
+    const addContactMessage = await addContact(userId, userTag);
+    res.status(200).json(addContactMessage);
   } catch (error: any) {
-    res.status(error.status).json({
-      message: "Failure To Add Contact"
-    })
-  }
+    res.status(404).json({
+      message: "User not found."
+    });
+  };
 };
 
 const getContactByUserIdController = async ({ params }: Request, res: Response) => {
   try {
-    const { id } = params
-    const contacts = await getContactByUserId(id)
-    res.status(200).json(contacts)
+    const { id } = params;
+    const contacts = await getContactByUserId(id);
+    res.status(200).json(contacts);
   } catch (error: any) {
-    res.status(error.status).json({
+    res.status(400).json({
       message: "Failure To Get Contacts"
-    })
-  }
-}
+    });
+  };
+};
 
 const getContactByContactNameController = async ({ query, params }: Request, res: Response) => {
   try {
-    const { userName } = query
-    const { id } = params
-    if (typeof id !== "string" || typeof userName !== "string") throw { message: "invalid data" }
-    const contacts = await getContactsByName(id, userName)
-    res.status(200).json(contacts)
+    const { userName } = query;
+    const { id } = params;
+    if (typeof id !== "string" || typeof userName !== "string") throw { message: "invalid data" };
+    const contacts = await getContactsByName(id, userName);
+    res.status(200).json(contacts);
   } catch (error: any) {
     res.status(error.status).json({
       message: "Failure To Get Contacts"
-    })
-  }
-}
+    });
+  };
+};
 
-const getAllKpisDataController = async ({ query, params }: Request, res: Response) => {
+const getContactBlockedController = async ({ query, params }: Request, res: Response) => {
   try {
-    const { id } = params
-    const usersNumber = await getAllKpisData(id)
-    res.status(200).json(usersNumber)
+    const { id } = params;
+    const usersNumber = await getContactBlocked(id);
+    res.status(200).json(usersNumber);
   } catch (error: any) {
     res.status(error.status).json({
       message: "Failure To Get Contacts"
-    })
+    });
   }
-}
+};
+
+const upDateInfoController = async ({ body }: Request, res: Response) => {
+  try {
+    const usersNumber = await upDateInfo(body);
+    res.status(200).json(usersNumber);
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    });
+  }
+};
+
+const putBlockUserController = async (req: Request, res: Response) => {
+  try {
+    const { id, otherUser, action } = req.query
+    if (typeof (id) !== "string" || typeof (otherUser) !== "string" || typeof (action) !== "string") throw { message: "Invalid data" }
+    const usersNumber = await putBlockUser(id, otherUser, action);
+    res.status(200).json(usersNumber);
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    });
+  }
+};
+
+const deleteContactController = async (req: Request, res: Response) => {
+  try {
+    const { id, otherUser } = req.query
+    if (typeof (id) !== "string" || typeof (otherUser) !== "string") throw { message: "Invalid data" }
+    const usersNumber = await deleteContact(id, otherUser);
+    res.status(200).json(usersNumber);
+  } catch (error: any) {
+    res.status(error.status).json({
+      message: "Failure To Get Contacts"
+    });
+  }
+};
+
+const deleteAccountUserController = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { email } = req.query;
+    if (typeof (email) !== "string") throw { message: "Invalid data" };
+    const usersNumber = await deleteAccountUser(id, email);
+    res.status(200).json(usersNumber);
+  } catch (error: any) {
+    res.status(500).json({
+      message: "Something went wrong."
+    });
+  }
+};
 
 export {
   createUser,
-  deleteUsers,
+  deleteUserController,
   addContactController,
   getContactByUserIdController,
   getContactByContactNameController,
-  getAllKpisDataController,
+  getContactBlockedController,
+  upDateInfoController,
+  putBlockUserController,
+  deleteContactController,
+  deleteAccountUserController
 };

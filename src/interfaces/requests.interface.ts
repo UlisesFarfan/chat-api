@@ -6,6 +6,7 @@ export interface RequestsInterface extends Document {
   receiver: ObjectId;
   transmitter: ObjectId;
   status: String;
+  viewed: Boolean;
   date: any;
 };
 export enum TypeStatus {

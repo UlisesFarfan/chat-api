@@ -16,12 +16,13 @@ interface RegisterInput extends UserInterface {
 };
 
 const serviceCreateUser = async (body: RegisterInput) => {
-  const { name, email, password } = body;
+  const { name, email, password, tag } = body;
 
   const userData = {
     email,
     name,
     password,
+    tag
   };
 
   try {
@@ -93,29 +94,52 @@ const extractUser = async (headers: any): Promise<string> => {
   }
 };
 
-const addContact = async (userId: string, contactId: string) => {
+const addContact = async (userId: string, userTag: string) => {
   try {
-    console.log(userId, contactId)
-    await UserModel.findByIdAndUpdate(
+    const newContact = await UserModel.find({
+      tag: userTag
+    })
+    if (newContact[0]._id.toString() === userId) throw new Error("User invalid.");
+    if (newContact.length === 0) throw new Error("User not found.");
+    const user = await UserModel.findByIdAndUpdate(
       userId,
       {
-        $push: {
+        $addToSet: {
+          contacts: newContact[0]._id
+        },
+        $pull: {
+          blocked: newContact[0]._id
+        },
+      },
+      { new: true }
+    ).populate({ path: "contacts blocked", select: "name description" })
+
+    if (!user) throw Error("Invalid data.")
+
+    return {
+      block_users: user.blocked,
+      friends: user.contacts
+    }
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+const deleteContact = async (userId: string, contactId: string) => {
+  try {
+    const user = await UserModel.findByIdAndUpdate(
+      userId,
+      {
+        $pull: {
           contacts: contactId
         }
       },
       { new: true }
-    )
-    await UserModel.findByIdAndUpdate(
-      contactId,
-      {
-        $push: {
-          contacts: userId
-        }
-      },
-      { new: true }
-    )
-    return "Contact Added Successfully"
+    ).populate({ path: "contacts", select: "name description" });
+    if (!user) throw new Error("Invalid data.")
+    return user.contacts
   } catch (error: any) {
+    console.log(error)
     throw error;
   }
 };
@@ -170,26 +194,123 @@ const getContactByUserId = async (userId: string) => {
   }
 };
 
-const getAllKpisData = async (id: string) => {
+const getContactBlocked = async (id: string) => {
   try {
-    const users = await UserModel.find()
-    const contacts = await UserModel.findById(id, {
-      contacts: 1,
+    const user = await UserModel.findById(id, {
       blocked: 1,
-      requests: 1,
       _id: 0
     })
-      .populate({ path: "contacts", select: "name description" });
-    return {
-      total_users: users.length,
-      contacts: contacts?.contacts,
-      blocked: contacts?.blocked.length,
-      requests: contacts?.requests.length
-    }
+      .populate({ path: "blocked", select: "name description" });
+    if (!user) throw Error("Invalid data.")
+    return user.blocked;
   } catch (error: any) {
     throw error;
-  }
-}
+  };
+};
+
+const putBlockUser = async (id: string, otherUser: string, action: string) => {
+  try {
+    let blocked;
+    let contacts;
+    if (action === "block") {
+      const user = await UserModel.findByIdAndUpdate(id, {
+        $pull: {
+          contacts: otherUser
+        },
+        $addToSet: {
+          blocked: otherUser
+        }
+      },
+        {
+          new: true
+        }
+      ).populate(
+        { path: "contacts blocked", select: "name description" }
+      )
+      if (!user) throw Error("Invalid data.")
+      blocked = user.blocked;
+      contacts = user.contacts
+    };
+    if (action === "unblock") {
+      const user = await UserModel.findByIdAndUpdate(id, {
+        $pull: {
+          blocked: otherUser
+        }
+      },
+        {
+          new: true
+        }
+      ).populate(
+        { path: "contacts blocked", select: "name description" }
+      );
+      if (!user) throw Error("Invalid data.")
+      blocked = user.blocked;
+      contacts = user.contacts;
+    };
+    return {
+      block_users: blocked,
+      friends: contacts
+    }
+  } catch (error: any) {
+    console.log(error)
+    throw error;
+  };
+};
+
+const upDateInfo = async (body: {
+  name: string;
+  description: string;
+  tag: string;
+  userId: string;
+}) => {
+  const { name, description, tag, userId } = body
+  try {
+    const upDateUser = await UserModel.findByIdAndUpdate(userId, {
+      name: name,
+      description: description,
+      tag: tag,
+    },
+      { new: true }
+    );
+    if (!upDateUser) throw new Error("Invalid user.")
+    const user = {
+      _id: upDateUser._id,
+      name: upDateUser.name,
+      tag: upDateUser.tag,
+      description: upDateUser.description,
+      email: upDateUser.email
+    }
+
+    return user;
+  } catch (error: any) {
+    console.log(error)
+    throw error;
+  };
+};
+
+const deleteAccountUser = async (userId: string, email: string) => {
+  try {
+    const user = await UserModel.findByIdAndUpdate(userId, {
+      name: "User deleted.",
+      contacts: [],
+      blocked: [],
+      chats: [],
+      archive_chats: [],
+      requests: [],
+      tag: email + "delete account.",
+      description: "",
+      notifications: [],
+      email: email + "delete account.",
+      delete_at: new Date(),
+    }, {
+      new: true
+    })
+    return "Account deleted successfully."
+  } catch (error: any) {
+    console.log(error)
+    throw error;
+  };
+};
 
 export {
   serviceCreateUser,
@@ -200,6 +321,10 @@ export {
   getUserById,
   getContactByUserId,
   getContactsByName,
-  getAllKpisData
+  getContactBlocked,
+  upDateInfo,
+  putBlockUser,
+  deleteContact,
+  deleteAccountUser
 };
 

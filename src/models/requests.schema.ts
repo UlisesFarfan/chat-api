@@ -22,6 +22,11 @@ const requestSchema = new Schema<RequestsInterface>(
       ],
       default: TypeStatus.PENDING
     },
+    viewed: {
+      type: Boolean,
+      require: true,
+      default: false
+    },
     date: {
       type: Date,
       default: new Date()

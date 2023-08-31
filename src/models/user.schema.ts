@@ -12,14 +12,24 @@ const userSchema = new Schema<UserInterface>(
         },
         blocked: {
             type: [Types.ObjectId],
+            ref: "User",
         },
         chats: {
             type: [Types.ObjectId],
-            ref: "Chat",
+            ref: "Chat"
+        },
+        archive_chats: {
+            type: [Types.ObjectId],
+            ref: "Chat"
         },
         requests: {
             type: [Types.ObjectId],
             ref: "Request",
+        },
+        tag: {
+            type: String,
+            unique: true,
+            required: true,
         },
         description: {
             type: String,
