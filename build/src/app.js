@@ -12,7 +12,7 @@ const express_session_1 = __importDefault(require("express-session"));
 const passport_1 = __importDefault(require("passport"));
 const app = (0, express_1.default)();
 const corsOptions = {
-    origin: "http://127.0.0.1:5173",
+    origin: "https://chat-app-eta-cyan.vercel.app/",
     credentials: true,
     preflightContinue: false,
 };
