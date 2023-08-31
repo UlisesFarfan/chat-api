@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const user_controller_1 = require("../controllers/user.controller");
+const authenticated_1 = require("../middlewares/authenticated");
+const router = (0, express_1.Router)();
+exports.router = router;
+router.post("/", user_controller_1.createUser);
+router.get("/block-users/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.getContactBlockedController);
+router.put("/block-user/", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.putBlockUserController);
+router.delete("/delete-user/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.deleteUserController);
+router.delete("/delete-contact", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.deleteContactController);
+router.delete("/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.deleteAccountUserController);
+router.post("/add", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.addContactController);
+router.get("/contact/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.getContactByUserIdController);
+router.get("/search-contact/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.getContactByContactNameController);
+router.post("/update-info/", [authenticated_1.validateToken, authenticated_1.isAuthenticated], user_controller_1.upDateInfoController);

@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.router = void 0;
+const express_1 = require("express");
+const chat_controller_1 = require("../controllers/chat.controller");
+const authenticated_1 = require("../middlewares/authenticated");
+const router = (0, express_1.Router)();
+exports.router = router;
+router.post("/", chat_controller_1.createChat);
+router.get("/", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.getAllChatsController);
+router.get("/chats/:id", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.getChatByIdController);
+router.get("/usersname/", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.getChatsUserByUsersNameController);
+router.get("/user/:userId", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.getChatsUserByIdController);
+router.put("/arichive", chat_controller_1.putArchiveChatController);
+router.delete("/delete-user-chat", chat_controller_1.deleteUserChatByIdController);
+router.delete("/delete-user-archive-chat", chat_controller_1.deletUserArchiveChatByIdController);
+router.get("/search-chat/:userId", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.getChatsUserByNameController);
+router.delete("/", [authenticated_1.validateToken, authenticated_1.isAuthenticated], chat_controller_1.deleteChatByIdController);
